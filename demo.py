@@ -9,7 +9,7 @@ st.title("Email Sender App")
 # Get user input
 recipient_email = "jaink7069@gmail.com"
 subject = "HII"
-body ="DAY 2 CONCLUDED"
+body ="DAY 2 CONCLUDED FINALLY"
 
 # Gmail credentials (replace with your own)
 sender_email = "teamryuks@gmail.com"
