@@ -13,7 +13,7 @@ recipient_email = st.text_input("Recipient Email:")
 send_date = st.date_input("Select Date")
 formatted_date = send_date.strftime("%Y-%m-%d")
 subject = "DATE"
-body = "formatted_date2"
+body = {formatted_date2}
 
 # Gmail credentials (replace with your own)
 sender_email = "teamryuks@gmail.com"
