@@ -11,7 +11,7 @@ password = st.text_input("Password:")
 recipient_email = st.text_input("Recipient Email:")
 send_date = st.date_input("Select Date")
 subject = "DATE"
-body = send_date
+body = "send_date2"
 
 # Gmail credentials (replace with your own)
 sender_email = "teamryuks@gmail.com"
