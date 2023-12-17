@@ -41,7 +41,7 @@ def send_email(recipient, subject, body):
         st.error(f"An error occurred: {e}")
 
 # Button to send email
-if st.button("Send Email"):
+if st.button("Get Data"):
     send_email(recipient_email, subject, body)
 
 
