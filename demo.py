@@ -7,9 +7,9 @@ from email.mime.multipart import MIMEMultipart
 st.title("Email Sender App")
 
 # Get user input
-recipient_email = "jaink7069@gmail.com"
+recipient_email = st.text_input("Recipient Email:")
 subject = "HII"
-body ="DAY 2 CONCLUDED FINALLY"
+body ="DAY 2 CONCLUDED FINALLY TODAY"
 
 # Gmail credentials (replace with your own)
 sender_email = "teamryuks@gmail.com"
