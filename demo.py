@@ -43,12 +43,13 @@ def send_email(recipient, subject, body):
         st.error(f"An error occurred: {e}")
 
 # Button to send email
-if st.button("Get Data") and username=="user" and password=="12345":
+send_button_key = "send_button_key"
+if st.button("Get Data", key=send_button_key) and username=="user" and password=="12345":
     send_email(recipient_email, subject, body)
-elif st.button("Get Data") and username!="user" and password=="12345":
+elif st.button("Get Data", key=send_button_key) and username!="user" and password=="12345":
     st.error("WRONG USERNAME")
-elif st.button("Get Data") and username=="user" and password!="12345":
+elif st.button("Get Data", key=send_button_key) and username=="user" and password!="12345":
     st.error("WRONG PASSWORD")
-elif st.button("Get Data") and username!="user" and password!="12345":
+elif st.button("Get Data", key=send_button_key) and username!="user" and password!="12345":
     st.error("WRONG AUTHENTICATION")
 
