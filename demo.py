@@ -11,7 +11,7 @@ password = st.text_input("Password:")
 recipient_email = st.text_input("Recipient Email:")
 send_date = st.date_input("Select Date")
 subject = "DATE"
-body = send_date
+body = "send_date"
 
 # Gmail credentials (replace with your own)
 sender_email = "teamryuks@gmail.com"
@@ -37,7 +37,7 @@ def send_email(recipient, subject, body):
             # Send the email
             server.sendmail(sender_email, recipient, message.as_string())
 
-        st.success("Email sent successfully!")
+        st.success("Email sent successfully {send_date} !")
 
     except Exception as e:
         st.error(f"An error occurred: {e}")
