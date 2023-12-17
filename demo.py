@@ -37,7 +37,7 @@ def send_email(recipient, subject, body):
             # Send the email
             server.sendmail(sender_email, recipient, message.as_string())
 
-        st.success("Email sent successfully {send_date} !")
+        st.success("Email sent successfully!")
 
     except Exception as e:
         st.error(f"An error occurred: {e}")
