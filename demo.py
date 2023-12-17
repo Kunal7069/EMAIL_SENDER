@@ -9,6 +9,7 @@ st.title("Data Fetching App")
 # Get user input
 password = st.text_input("Password:")
 recipient_email = st.text_input("Recipient Email:")
+send_date = st.date_input("Select Date")
 subject = "HII"
 body ="DAY 2 CONCLUDED FINALLY TODAY"
 
