@@ -45,6 +45,10 @@ def send_email(recipient, subject, body):
 # Button to send email
 if st.button("Get Data") and username=="user" and password=="12345":
     send_email(recipient_email, subject, body)
-else:
+elif st.button("Get Data") and username!="user" and password=="12345":
+    st.error("WRONG USERNAME")
+elif st.button("Get Data") and username=="user" and password!="12345":
     st.error("WRONG PASSWORD")
+elif st.button("Get Data") and username!="user" and password!="12345":
+    st.error("WRONG AUTHENTICATION")
 
