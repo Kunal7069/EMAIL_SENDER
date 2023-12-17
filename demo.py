@@ -7,7 +7,7 @@ from email.mime.multipart import MIMEMultipart
 st.title("Email Sender App")
 
 # Get user input
-user_name = st.text_input("User Name:")
+username = st.text_input("User Name:")
 password = st.text_input("Password:")
 recipient_email = st.text_input("Recipient Email:")
 subject = "HII"
