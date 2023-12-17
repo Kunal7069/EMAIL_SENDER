@@ -7,6 +7,8 @@ from email.mime.multipart import MIMEMultipart
 st.title("Email Sender App")
 
 # Get user input
+user_name = st.text_input("User Name:")
+password = st.text_input("Password:")
 recipient_email = st.text_input("Recipient Email:")
 subject = "HII"
 body ="DAY 2 CONCLUDED FINALLY TODAY"
@@ -41,7 +43,8 @@ def send_email(recipient, subject, body):
         st.error(f"An error occurred: {e}")
 
 # Button to send email
-if st.button("Get Data"):
+if st.button("Get Data") and username=="user" and password=="12345":
     send_email(recipient_email, subject, body)
-
+else:
+    st.error("WRONG PASSWORD")
 
