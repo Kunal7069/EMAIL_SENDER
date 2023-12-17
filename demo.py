@@ -2,6 +2,7 @@ import streamlit as st
 import smtplib
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
+from datetime import datetime
 
 # Streamlit app title
 st.title("Data Fetching App")
@@ -10,8 +11,9 @@ st.title("Data Fetching App")
 password = st.text_input("Password:")
 recipient_email = st.text_input("Recipient Email:")
 send_date = st.date_input("Select Date")
+formatted_date = send_date.strftime("%Y-%m-%d")
 subject = "DATE"
-body = "send_2date"
+body = formatted_date
 
 # Gmail credentials (replace with your own)
 sender_email = "teamryuks@gmail.com"
