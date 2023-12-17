@@ -7,7 +7,6 @@ from email.mime.multipart import MIMEMultipart
 st.title("Email Sender App")
 
 # Get user input
-username = st.text_input("User Name:")
 password = st.text_input("Password:")
 recipient_email = st.text_input("Recipient Email:")
 subject = "HII"
@@ -53,5 +52,7 @@ send_button_key = f"send_button_key_{hash((recipient_email, subject, body))}"
 # elif st.button("Get Data", key=send_button_key) and username!="user" and password!="12345":
 #     st.error("WRONG AUTHENTICATION")
 if st.button("Get Data"):
-    send_email(recipient_email, subject, body)
-
+    if password=="12345":
+        send_email(recipient_email, subject, body)
+    else:
+        st.success("Email not sent successfully!")
