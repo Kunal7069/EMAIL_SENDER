@@ -46,4 +46,4 @@ if st.button("Get Data"):
     if password=="12345":
         send_email(recipient_email, subject, body)
     else:
-        st.success("Email not sent successfully!")
+        st.error("Wrong Password!")
