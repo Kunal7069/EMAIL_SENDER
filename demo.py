@@ -4,7 +4,7 @@ from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 
 # Streamlit app title
-st.title("Email Sender App")
+st.title("Data Fetching App")
 
 # Get user input
 password = st.text_input("Password:")
