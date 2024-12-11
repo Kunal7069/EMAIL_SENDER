@@ -1,143 +1,142 @@
 import streamlit as st
 import smtplib
-from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
-from datetime import datetime
-import os
+from email.mime.text import MIMEText
+from pymongo import MongoClient
+from prettytable import PrettyTable
+import re
 
-# Streamlit app title
-st.title("Data Fetching App")
+# --------------------- Configuration ---------------------
 
-# Get user input
-password = st.text_input("Password:")
-recipient_email = st.text_input("Recipient Email:")
-send_date = st.date_input("Select Date")
-# body = "The data for asked date is: "
-subject = "DATA"
-# body = "formatted_date4"
+# MongoDB Configuration (Hardcoded)
+MONGODB_URI = "mongodb+srv://TEST:12345@mubustest.yfyj3.mongodb.net/investz?retryWrites=true&w=majority"
+DATABASE_NAME = "NALCO"
+COLLECTION_NAME = "NALCO"
 
-# Gmail credentials (replace with your own)
-sender_email = "k63814776@gmail.com"
-sender_password = "bnyc enyb ekxt cwii"
+# Email Configuration (Hardcoded)
+SENDER_EMAIL = "2100520100135@ietlucknow.ac.in"
+SENDER_PASSWORD = "sejf cdkr wari uvtl"  # Use an app-specific password if using Gmail
+SMTP_SERVER = "smtp.gmail.com"
+SMTP_PORT = 587  # For TLS
 
+# Email Subject
+EMAIL_SUBJECT = "DATABASE BACKUP"
 
+# --------------------- Helper Functions ---------------------
 
-from google.auth.transport.requests import Request
-from google.oauth2.credentials import Credentials
-from google_auth_oauthlib.flow import InstalledAppFlow
-from googleapiclient.discovery import build
-from googleapiclient.errors import HttpError
-from datetime import datetime,date
-import numpy as np
+def is_valid_email(email):
+    """
+    Validates the format of the email address.
+    """
+    regex = r'^\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,4}\b'
+    return re.match(regex, email)
 
-# from mysite.tasks import add
-
-
-def sheet(formatted_date):
-    # entriesadded=EntriesAdded.objects.filter(name='LadleUpdateRoomWise')
-    # count=entriesadded[0].count
-    SCOPES = ['https://www.googleapis.com/auth/spreadsheets']
-    SPREADSHEET_ID = '1AQ6TgA_hm2bocR8eEwC9WLBDc7vScjg2ZhKAwAvIIBQ'
-    SAMPLE_RANGE_NAME = 'Sheet1'
-    creds = None
-    if os.path.exists("token.json"):
-        creds = Credentials.from_authorized_user_file("token.json",SCOPES)
-    if not creds or not creds.valid:
-    
-        if creds and creds.expired and creds.refresh_token:
-            creds.refresh(Request())
-        else:
-            flow = InstalledAppFlow.from_client_secrets_file("credentials.json",SCOPES)
-            creds = flow.run_local_server(port=0)
-        with open("token.json","w") as token:
-            token.write(creds.to_json())
-    service = build("sheets","v4", credentials=creds)
-    sheet = service.spreadsheets().get(spreadsheetId=SPREADSHEET_ID).execute()
-    sheets = sheet['sheets']
-    # today = date.today()
-    today = str(formatted_date)
-    # Print sheet names
-    for sheet in sheets:
-        sheet_title = sheet['properties']['title']
-        if sheet_title == today:
-            break
-    else:
-        
-    # Create a new sheet with today's date as the name
-        request_body = {
-            'requests': [
-                {
-                    'addSheet': {
-                        'properties': {
-                            'title': today
-                        }
-                    }
-                }
-            ]
-        }
-        service.spreadsheets().batchUpdate(spreadsheetId= SPREADSHEET_ID , body=request_body).execute()
-    # 
-
-    sheet = service.spreadsheets()
-    result = sheet.values().get(spreadsheetId=SPREADSHEET_ID,range=f'{today}!A:G').execute()
-    value = result.get('values',[])
-    value = np.array(value)
-    return value
-    
-
-# Function to send email
-def send_email(recipient, subject):
+def fetch_mongodb_data():
+    """
+    Connects to MongoDB, fetches data from the specified collection,
+    and returns it as a list of dictionaries.
+    """
     try:
-        # Create the MIME object
-        formatted_date = send_date.strftime("%Y-%m-%d")
+        client = MongoClient(MONGODB_URI)
+        db = client[DATABASE_NAME]
+        collection = db[COLLECTION_NAME]
+        documents = list(collection.find())
 
-        # Concatenate the date with the existing body
-        # body = f"{body} {formatted_date}"
-        # print(body) 
-        body = sheet(formatted_date)
-        print(body) 
-        numpy_array = body
-        numpy_array = numpy_array[1:]
-        numpy_array = numpy_array[:,[0,1,2,5]]
-        headings = ["Laddle number","Location","Entry time","Exit time"]
-        numpy_array = np.vstack((headings, numpy_array))
-        from prettytable import PrettyTable
-        data = numpy_array
+        if not documents:
+            st.warning("No data found in the MongoDB collection.")
+            return None
 
-# Create a PrettyTable instance
-        table = PrettyTable()
+        # Remove the MongoDB '_id' field for readability
+        for doc in documents:
+            doc.pop('_id', None)
 
-        # Set the column names
-        table.field_names = data[0]
+        return documents
 
-        # Add rows to the table
-        for row in data[1:]:
-            table.add_row(row)
-        body = table
-        print(body) 
-        message = MIMEMultipart()
-        message['From'] = sender_email
-        message['To'] = recipient
-        message['Subject'] = subject
-        message.attach(MIMEText(f"Your required data is \n {body}", 'plain'))
+    except Exception as e:
+        st.error(f"Error connecting to MongoDB: {e}")
+        return None
 
-        # Connect to Gmail's SMTP server
-        with smtplib.SMTP_SSL('smtp.gmail.com', 465) as server:
-            # Login to the sender's email account
-            server.login(sender_email, sender_password)
+def create_html_table(data):
+    """
+    Converts a list of dictionaries to an HTML table using PrettyTable.
+    """
+    if not data:
+        return "<p>No data available to display.</p>"
 
-            # Send the email
-            server.sendmail(sender_email, recipient, message.as_string())
+    # Initialize PrettyTable with headers
+    headers = data[0].keys()
+    table = PrettyTable()
+    table.field_names = headers
+
+    # Add rows to the table
+    for entry in data:
+        row = [str(entry.get(field, "")) for field in headers]
+        table.add_row(row)
+
+    # Convert PrettyTable to HTML
+    html_table = table.get_html_string(attributes={"border": "1", "style": "border-collapse: collapse; width: 100%;"})
+    return html_table
+
+def send_email(recipient, subject, html_content):
+    """
+    Composes and sends an email with the given HTML content.
+    """
+    try:
+        # Set up the MIME
+        msg = MIMEMultipart()
+        msg['From'] = SENDER_EMAIL
+        msg['To'] = recipient
+        msg['Subject'] = subject
+
+        # Attach the HTML content
+        msg.attach(MIMEText(html_content, 'html'))
+
+        # Connect to the SMTP server
+        server = smtplib.SMTP(SMTP_SERVER, SMTP_PORT)
+        server.starttls()  # Secure the connection
+        server.login(SENDER_EMAIL, SENDER_PASSWORD)
+        server.send_message(msg)
+        server.quit()
 
         st.success("Email sent successfully!")
 
     except Exception as e:
-        st.error(f"An error occurred: {e}")
-        print(e)
-# Button to send email
-if st.button("Get Data"):
-    if password=="12345":
-        
-        send_email(recipient_email, subject)
-    else:
-        st.error("Wrong Password!")
+        st.error(f"An error occurred while sending the email: {e}")
+
+# --------------------- Streamlit App ---------------------
+
+def main():
+    # App Title
+    st.title("MongoDB Data Fetch and Email Sender")
+
+    st.markdown("""
+    ### Get your data via email
+    Enter your email address below and click *Send Data via Email* to receive the latest data from the Database collection.
+    """)
+
+    # Recipient Email Input
+    recipient_email = st.text_input("Recipient Email:")
+
+    # Send Email Button
+    send_button = st.button("Send Data via Email")
+
+    # --------------------- Main Logic ---------------------
+    if send_button:
+        if recipient_email:
+            if is_valid_email(recipient_email):
+                with st.spinner("Fetching data from MongoDB..."):
+                    data = fetch_mongodb_data()
+
+                if data:
+                    with st.spinner("Creating email content..."):
+                        html_table = create_html_table(data)
+
+                    with st.spinner("Sending email..."):
+                        send_email(recipient_email, EMAIL_SUBJECT, html_table)
+            else:
+                st.error("Please enter a valid email address.")
+        else:
+            st.error("Please enter a recipient email address.")
+
+if __name__ == "__main__":
+    main()
